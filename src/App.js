@@ -20,6 +20,7 @@ var data = require('./data/database.json');
     messagingSenderId: "441428437256"
   };
   firebase.initializeApp(config);
+  //var fsdb = firebase.firestore();
 
   /*
   // Get a reference to the database service
@@ -50,8 +51,14 @@ for(var x = 1; x < datasize+1; x++){
   });
 }
 
-console.log(dataset);
+//fsdb.collection("tickets").get().then((querySnapshot) => {
+  //querySnapshot.forEach((doc) => {
+    //dataset.push({'id': doc.id, 'name': doc.data(), 'hash': doc.data()});
+    //console.log(`${doc.id} => ${doc.data()}`);
+  //});
+//});
 
+console.log(dataset);
 
 
 const columns = [{
@@ -74,7 +81,6 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        
         <Tabs>
         <div label="Tickets">
           List of tickets
@@ -82,25 +88,43 @@ class App extends Component {
         </div>
         <div label="Send">
           Send Tickets
-          <form>
-  <label>
-    Name:
-    <input type="text" name="name" />
-  </label>
-  <input type="submit" value="Submit" />
-</form>
+          <form onSubmit={this.pushData}>
+            <label>
+              Name:
+            <input type="text" name="name" ref="name" />
+            </label>
+            <input type="submit" value="Submit" />
+          </form>
         </div>
         <div label="Admin">
           to be added
         </div>
       </Tabs>
 
-
-
-
-
       </div>
     );
+  }
+
+  pushData = (event) => {
+    event.preventDefault();
+    var nextticket = 0;
+    var newname = this.refs.name.value;
+
+    firebase.database().ref("total/").once("value")
+    .then(function(snapshot) {
+  
+
+    firebase.database().ref(snapshot.val()+1).set({
+      name: newname,
+      id: snapshot.val()+1
+    });
+
+    firebase.database().ref("total").set(snapshot.val()+1)
+
+    });
+
+    
+
   }
 }
 
