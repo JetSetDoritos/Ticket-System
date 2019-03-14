@@ -2,13 +2,27 @@ import sys
 import os
 import json
 import hashlib
+from firebase import Firebase
 
+
+config = {
+    "apiKey": "AIzaSyBKTvYuchVUVMBETWFvRsO56eP_7yIWqCs",
+    "authDomain": "ticket-system-d1de5.firebaseapp.com",
+    "databaseURL": "https://ticket-system-d1de5.firebaseio.com",
+    "projectId": "ticket-system-d1de5",
+    "storageBucket": "ticket-system-d1de5.appspot.com",
+    "messagingSenderId": "441428437256"
+}
+firebase = Firebase(config)
+
+db = firebase.database()
 
 with open('database.json') as json_file:  
     data = json.load(json_file)
 
 totals = 0
-for p in data:
+ticketcount = db.get()
+for p in ticketcount.each():
     totals = totals+1
 
 print(totals)
@@ -29,6 +43,20 @@ def sell():
     with open('database.json', 'w') as outfile:  
         json.dump(data, outfile)
     return "ticket saved!"
+
+def sell2():
+    tickets = db.get()
+    temptotal = 0
+    for p in tickets.each():
+        temptotal = temptotal + 1
+    if(temptotal != totals):
+        for x in range(totals,temptotal):
+            name = db.child(x).child("name").val()
+            t = hashlib.sha256()
+            t.update(str(temptotal).encode())
+            t.update(str(name).encode())
+            temphash = t.hexdigest()
+            db.child(x).update({"hash": str(temphash)})
  
 def one():
     return "one"

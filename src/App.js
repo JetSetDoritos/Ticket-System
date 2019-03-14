@@ -20,7 +20,7 @@ var data = require('./data/database.json');
     messagingSenderId: "441428437256"
   };
   firebase.initializeApp(config);
-  //var fsdb = firebase.firestore();
+  
 
   /*
   // Get a reference to the database service
@@ -36,27 +36,23 @@ console.log(data);
 var dataset = [];
 var datasize = 8;
 var dummy;
-/*for(dummy in data){
-  datasize++;
-}
-for (var x = 1; x < datasize+1; x++){
-  console.log(x)
-  dataset.push({'id': data[x.toString()].id, 'name': data[x.toString()].name, 'hash': data[x.toString()].hash});
-}*/
 
-for(var x = 1; x < datasize+1; x++){
-  firebase.database().ref(x).once('value').then(function(snapshot) {
-    dataset.push({'id': snapshot.val().id, 'name': snapshot.val().name, 'hash': snapshot.val().hash});
-    // ...
-  });
-}
 
-//fsdb.collection("tickets").get().then((querySnapshot) => {
-  //querySnapshot.forEach((doc) => {
-    //dataset.push({'id': doc.id, 'name': doc.data(), 'hash': doc.data()});
-    //console.log(`${doc.id} => ${doc.data()}`);
-  //});
-//});
+firebase.database().ref("total/").once("value")
+    .then(function(snapshot) {
+  
+
+      for(var x = 1; x < snapshot.val()+1; x++){
+        firebase.database().ref(x).once('value').then(function(snapshot2) {
+          dataset.push({'id': snapshot2.val().id, 'name': snapshot2.val().name, 'hash': snapshot2.val().hash});
+          // ...
+        });
+      }
+    });
+
+
+
+
 
 console.log(dataset);
 
@@ -122,8 +118,6 @@ class App extends Component {
     firebase.database().ref("total").set(snapshot.val()+1)
 
     });
-
-    
 
   }
 }
