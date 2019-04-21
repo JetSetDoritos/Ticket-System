@@ -20,7 +20,8 @@ var data = require('./data/database.json');
     messagingSenderId: "441428437256"
   };
   firebase.initializeApp(config);
-  
+
+ 
 
   /*
   // Get a reference to the database service
@@ -34,8 +35,10 @@ var data = require('./data/database.json');
 console.log(data);
 
 var dataset = [];
-var datasize = 8;
-var dummy;
+var eventName = "";
+var eventDate = "";
+var eventTime = "";
+var customTicket = false;
 
 
 firebase.database().ref("total/").once("value")
@@ -43,15 +46,23 @@ firebase.database().ref("total/").once("value")
   
 
       for(var x = 1; x < snapshot.val()+1; x++){
-        firebase.database().ref(x).once('value').then(function(snapshot2) {
+        firebase.database().ref("tickets").child(x).once('value').then(function(snapshot2) {
           dataset.push({'id': snapshot2.val().id, 'name': snapshot2.val().name, 'hash': snapshot2.val().hash});
           // ...
         });
       }
     });
 
+firebase.database().ref("event").once("value").then(function(snapshot){
+  eventName = snapshot.val().name;
+  eventDate = snapshot.val().date;
+  eventTime = snapshot.val().time;
+  customTicket = snapshot.val().custom;
+  console.log(snapshot);
+  });
 
 
+console.log("Eventname " + eventName);
 
 
 console.log(dataset);
@@ -93,7 +104,29 @@ class App extends Component {
           </form>
         </div>
         <div label="Admin">
-          to be added
+        <form onSubmit={this.ticketTemplate}>
+            <label>
+              Event Name:
+            <input type="text" name="event name" ref="eventName" />
+            </label>
+            <br></br>
+            <label>
+              Event Time:
+            <input type="text" name="event time" ref="eventTime" />
+            </label>
+            <br></br>
+            <label>
+              Event Date:
+            <input type="text" name="name date" ref="eventDate" />
+            </label>
+            <br></br>
+            <label>
+              Custom Ticket:
+              <input type="checkbox" name="custom ticket" ref="customTicket"/>
+            </label>
+            <br></br>
+            <input type="submit" value="Submit" />
+          </form>
         </div>
       </Tabs>
 
@@ -110,15 +143,29 @@ class App extends Component {
     .then(function(snapshot) {
   
 
-    firebase.database().ref(snapshot.val()+1).set({
+    firebase.database().ref("tickets").child(snapshot.val()+1).set({
       name: newname,
-      id: snapshot.val()+1
+      id: snapshot.val()+1,
+      processed: "false"
     });
 
-    firebase.database().ref("total").set(snapshot.val()+1)
+    firebase.database().ref("total").set(snapshot.val()+1);
 
     });
 
+  }
+
+  ticketTemplate = (event) => {
+    event.preventDefault();
+    console.log("ticket template changed");
+    if((eventName !== this.refs.eventName.value) && (this.refs.eventName.value != ""))
+      firebase.database().ref("event").child("name").set(this.refs.eventName.value);
+    if((eventTime !== this.refs.eventTime.value) && (this.refs.eventTime.value != ""))
+      firebase.database().ref("event").child("time").set(this.refs.eventTime.value);
+    if((eventDate !== this.refs.eventDate.value) && (this.refs.eventDate.value != ""))
+      firebase.database().ref("event").child("date").set(this.refs.eventDate.value);
+    if(customTicket !== this.refs.customTicket.checked)
+      firebase.database().ref("event").child("custom").set(this.refs.customTicket.checked);
   }
 }
 
