@@ -4,22 +4,18 @@ import './App.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import Tabs from './Tabs';
 import PropTypes from 'prop-types';
-import firebase from "firebase";
+//import * as firebase from 'firebase';
+import {Link} from 'react-router-dom';
+import Login from './components/Login';
+import {BrowserRouter,Route} from 'react-router-dom';
+import app from './base'
+require('firebase/auth');
 
 
 
 var data = require('./data/database.json');
 
   // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyBKTvYuchVUVMBETWFvRsO56eP_7yIWqCs",
-    authDomain: "ticket-system-d1de5.firebaseapp.com",
-    databaseURL: "https://ticket-system-d1de5.firebaseio.com",
-    projectId: "ticket-system-d1de5",
-    storageBucket: "ticket-system-d1de5.appspot.com",
-    messagingSenderId: "441428437256"
-  };
-  firebase.initializeApp(config);
 
  
 
@@ -40,20 +36,22 @@ var eventDate = "";
 var eventTime = "";
 var customTicket = false;
 
+var isAdmin = false;
 
-firebase.database().ref("total/").once("value")
+
+app.database().ref("total/").once("value")
     .then(function(snapshot) {
   
 
       for(var x = 1; x < snapshot.val()+1; x++){
-        firebase.database().ref("tickets").child(x).once('value').then(function(snapshot2) {
+        app.database().ref("tickets").child(x).once('value').then(function(snapshot2) {
           dataset.push({'id': snapshot2.val().id, 'name': snapshot2.val().name, 'hash': snapshot2.val().hash});
           // ...
         });
       }
     });
 
-firebase.database().ref("event").once("value").then(function(snapshot){
+app.database().ref("event").once("value").then(function(snapshot){
   eventName = snapshot.val().name;
   eventDate = snapshot.val().date;
   eventTime = snapshot.val().time;
@@ -66,6 +64,15 @@ console.log("Eventname " + eventName);
 
 
 console.log(dataset);
+
+app.database().ref("users").child("admins").once("value").then(function(snapshot){
+  if(app.auth().currentUser)  
+    if(snapshot.val().a1 == app.auth().currentUser.uid)
+        isAdmin = true;
+
+      console.log("is admin:");
+      console.log(isAdmin);
+});
 
 
 const columns = [{
@@ -85,13 +92,50 @@ console.log(products);
 
 class App extends Component {
   
+  constructor() {
+    super();
+    this.state = {
+      authenticated: false
+    };
+  }
+
+  componentWillMount() {
+    this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({
+          authenticated: true,
+          //loading: false
+        })
+      } else {
+        this.setState({
+          authenticated: false,
+          //loading: false
+        })
+      }
+})
+  }
+
+  componentWillUnmount() {
+    this.removeAuthListener();
+  }
+
+
   render() {
     return (
+      <BrowserRouter>
       <div className="App">
+        <Route exact path="/login" component={Login} />
+        {this.state.authenticated
+        ? null
+        : <Link className="linker" to="/login">Login</Link>
+        }
         <Tabs>
         <div label="Tickets">
           List of tickets
-          <BootstrapTable keyField='id' data={ dataset } columns={ columns }  />
+          {this.state.authenticated
+          ? <BootstrapTable keyField='id' data={ dataset } columns={ columns }  />
+          : null
+          }
         </div>
         <div label="Send">
           Send Tickets
@@ -103,6 +147,8 @@ class App extends Component {
             <input type="submit" value="Submit" />
           </form>
         </div>
+        {isAdmin
+        ? (
         <div label="Admin">
         <form onSubmit={this.ticketTemplate}>
             <label>
@@ -127,10 +173,12 @@ class App extends Component {
             <br></br>
             <input type="submit" value="Submit" />
           </form>
-        </div>
+        </div>)
+        :  (<div label="User"></div>)}
       </Tabs>
-
+      
       </div>
+      </BrowserRouter>
     );
   }
 
@@ -139,17 +187,17 @@ class App extends Component {
     var nextticket = 0;
     var newname = this.refs.name.value;
 
-    firebase.database().ref("total/").once("value")
+    app.database().ref("total/").once("value")
     .then(function(snapshot) {
   
 
-    firebase.database().ref("tickets").child(snapshot.val()+1).set({
+    app.database().ref("tickets").child(snapshot.val()+1).set({
       name: newname,
       id: snapshot.val()+1,
       processed: "false"
     });
 
-    firebase.database().ref("total").set(snapshot.val()+1);
+    app.database().ref("total").set(snapshot.val()+1);
 
     });
 
@@ -159,14 +207,15 @@ class App extends Component {
     event.preventDefault();
     console.log("ticket template changed");
     if((eventName !== this.refs.eventName.value) && (this.refs.eventName.value != ""))
-      firebase.database().ref("event").child("name").set(this.refs.eventName.value);
+      app.database().ref("event").child("name").set(this.refs.eventName.value);
     if((eventTime !== this.refs.eventTime.value) && (this.refs.eventTime.value != ""))
-      firebase.database().ref("event").child("time").set(this.refs.eventTime.value);
+      app.database().ref("event").child("time").set(this.refs.eventTime.value);
     if((eventDate !== this.refs.eventDate.value) && (this.refs.eventDate.value != ""))
-      firebase.database().ref("event").child("date").set(this.refs.eventDate.value);
+      app.database().ref("event").child("date").set(this.refs.eventDate.value);
     if(customTicket !== this.refs.customTicket.checked)
-      firebase.database().ref("event").child("custom").set(this.refs.customTicket.checked);
+      app.database().ref("event").child("custom").set(this.refs.customTicket.checked);
   }
+  
 }
 
 export default App;
