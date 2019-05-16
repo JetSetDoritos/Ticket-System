@@ -11,6 +11,7 @@ import {BrowserRouter,Route} from 'react-router-dom';
 import app from './base'
 import EventSettings from './components/EventSettings'
 import TicketsList from './components/TicketsList';
+import SendTicket from './components/SendTicket'
 require('firebase/auth');
 
 
@@ -96,13 +97,7 @@ class App extends Component {
         </div>
         <div label="Send">
           Send Tickets
-          <form onSubmit={this.pushData}>
-            <label>
-              Name:
-            <input type="text" name="name" ref="name" />
-            </label>
-            <input type="submit" value="Submit" />
-          </form>
+          <SendTicket/>
         </div>
         {isAdmin
         ? (
@@ -117,26 +112,7 @@ class App extends Component {
     );
   }
 
-  pushData = (event) => {
-    event.preventDefault();
-    var nextticket = 0;
-    var newname = this.refs.name.value;
 
-    app.database().ref("total/").once("value")
-    .then(function(snapshot) {
-  
-
-    app.database().ref("tickets").child(snapshot.val()+1).set({
-      name: newname,
-      id: snapshot.val()+1,
-      processed: "false"
-    });
-
-    app.database().ref("total").set(snapshot.val()+1);
-
-    });
-
-  }
 
 
   

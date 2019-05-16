@@ -13,6 +13,9 @@ const columns = [{
   }, {
     dataField: 'hash',
     text: 'Hash'
+  }, {
+      dataField: 'seller',
+      text: 'Seller'
   }];
 
 class TicketsList extends Component {
@@ -37,7 +40,10 @@ class TicketsList extends Component {
 
       app.database().ref("events").child("0").child("tickets").once('value').then(function(snapshot2) {
         for(var x = 1; x < snapshot.val()+1; x++){
-        tempDataset.push({'id': snapshot2.child(x).val().id, 'name': snapshot2.child(x).val().name, 'hash': snapshot2.child(x).val().hash});
+        tempDataset.push({'id': snapshot2.child(x).val().id,
+         'name': snapshot2.child(x).val().name,
+          'hash': snapshot2.child(x).val().hash,
+          'seller': snapshot2.child(x).val().seller});
         }// ...
 
         self.setState({
