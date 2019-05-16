@@ -7,7 +7,7 @@ class EventSettings extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            title : props.title,
+            title : "",
             time : "",
             date : "",
             custom : false,
@@ -17,19 +17,17 @@ class EventSettings extends Component {
    
     
 
-    componentDidMount(){
+    componentWillMount(){
         var self = this;
         app.database().ref("events").child("0").child("event").once("value").then(function(snapshot){
-            //eventName = snapshot.val().name;
             //eventDate = snapshot.val().date;
             //eventTime = snapshot.val().time;
             //customTicket = snapshot.val().custom;
-            //console.log("eventDetails" + eventName);
             self.setState({
                 title : snapshot.val().name,
-                time : "",
-                date : "",
-                custom : false,
+                time : snapshot.val().time,
+                date : snapshot.val().date,
+                custom : snapshot.val().custom,
                 value: ''
             })
 
@@ -40,8 +38,6 @@ class EventSettings extends Component {
     //<form onSubmit={this.ticketTemplate}>
 
     render(){
-
-        console.log(this.title)
         
         return(
         <form>
@@ -52,17 +48,17 @@ class EventSettings extends Component {
             <br></br>
             <label>
               Event Time:
-            <input type="text" name="event time" ref="eventTime" />
+            <input type="text" name="event time" ref="eventTime" placeholder = {this.state.time}/>
             </label>
             <br></br>
             <label>
               Event Date:
-            <input type="text" name="name date" ref="eventDate" />
+            <input type="text" name="name date" ref="eventDate" placeholder = {this.state.date}/>
             </label>
             <br></br>
             <label>
               Custom Ticket:
-              <input type="checkbox" name="custom ticket" ref="customTicket"/>
+              <input type="checkbox" name="custom ticket" ref="customTicket" checked = {this.state.custom}/>
             </label>
             <br></br>
             <input type="submit" value="Submit" />

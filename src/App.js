@@ -165,7 +165,7 @@ class App extends Component {
         {isAdmin
         ? (
         <div label="Admin">
-          <EventSettings title="aaaa"/>
+          <EventSettings/>
         </div>)
         :  (<div label="User"></div>)}
       </Tabs>
