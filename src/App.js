@@ -10,6 +10,7 @@ import Login from './components/Login';
 import {BrowserRouter,Route} from 'react-router-dom';
 import app from './base'
 import EventSettings from './components/EventSettings'
+import TicketsList from './components/TicketsList';
 require('firebase/auth');
 
 
@@ -31,52 +32,8 @@ var data = require('./data/database.json');
 
 console.log(data);
 
-var dataset = [];
-var eventName = "";
-var eventDate = "";
-var eventTime = "";
-var customTicket = false;
-
 var isAdmin = true;
 
-
-app.database().ref("events").child("0").child("total/").once("value")
-    .then(function(snapshot) {
-  
-
-      for(var x = 1; x < snapshot.val()+1; x++){
-        app.database().ref("events").child("0").child("tickets").child(x).once('value').then(function(snapshot2) {
-          dataset.push({'id': snapshot2.val().id, 'name': snapshot2.val().name, 'hash': snapshot2.val().hash});
-          // ...
-        });
-      }
-    });
-
-app.database().ref("events").child("0").child("event").once("value").then(function(snapshot){
-  eventName = snapshot.val().name;
-  eventDate = snapshot.val().date;
-  eventTime = snapshot.val().time;
-  customTicket = snapshot.val().custom;
-  console.log("eventDetails" + eventName);
-  });
-
-const titleGet = getEventTitle()
-
-function getEventTitle() {
-  app.database().ref("events").child("0").child("event").once("value").then(function(snapshot){
-    eventName = snapshot.val().name;
-    eventDate = snapshot.val().date;
-    eventTime = snapshot.val().time;
-    customTicket = snapshot.val().custom;
-    console.log("eventDetails" + eventName);
-    });
-
-    return(eventName);
-}
-
-
-
-console.log(dataset);
 
 app.database().ref("events").child("0").child("users").child("admins").once("value").then(function(snapshot){
   if(app.auth().currentUser)  
@@ -87,21 +44,6 @@ app.database().ref("events").child("0").child("users").child("admins").once("val
       console.log(isAdmin);
 });
 
-
-const columns = [{
-  dataField: 'id',
-  text: 'ID'
-}, {
-  dataField: 'name',
-  text: 'Name'
-}, {
-  dataField: 'hash',
-  text: 'Hash'
-}];
-
-
-const products = [{'id': '1', 'name': '2', 'price': '3'}]
-console.log(products);
 
 class App extends Component {
   
@@ -147,7 +89,7 @@ class App extends Component {
           <center>
           List of tickets
           {this.state.authenticated
-          ? <BootstrapTable keyField='id' data={ dataset } columns={ columns }  />
+          ? <TicketsList/>
           : null
           }
           </center>
@@ -196,18 +138,7 @@ class App extends Component {
 
   }
 
-  ticketTemplate = (event) => {
-    event.preventDefault();
-    console.log("ticket template changed");
-    if((eventName !== this.refs.eventName.value) && (this.refs.eventName.value != ""))
-      app.database().ref("event").child("name").set(this.refs.eventName.value);
-    if((eventTime !== this.refs.eventTime.value) && (this.refs.eventTime.value != ""))
-      app.database().ref("event").child("time").set(this.refs.eventTime.value);
-    if((eventDate !== this.refs.eventDate.value) && (this.refs.eventDate.value != ""))
-      app.database().ref("event").child("date").set(this.refs.eventDate.value);
-    if(customTicket !== this.refs.customTicket.checked)
-      app.database().ref("event").child("custom").set(this.refs.customTicket.checked);
-  }
+
   
 }
 

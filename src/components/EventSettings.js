@@ -40,7 +40,7 @@ class EventSettings extends Component {
     render(){
         
         return(
-        <form>
+        <form onSubmit={this.ticketTemplate}>
             <label>
               Event Name:
             <input type="text" name="event name" ref="eventName" placeholder = {this.state.title} />
@@ -58,7 +58,7 @@ class EventSettings extends Component {
             <br></br>
             <label>
               Custom Ticket:
-              <input type="checkbox" name="custom ticket" ref="customTicket" checked = {this.state.custom}/>
+              <input type="checkbox" name="custom ticket" ref="customTicket" checked = {this.state.custom} onChange = {this.flipState} />
             </label>
             <br></br>
             <input type="submit" value="Submit" />
@@ -66,6 +66,41 @@ class EventSettings extends Component {
         )
     }
 
+    flipState = (event) => {
+        var self = this
+        var tempState = self.state
+        tempState.custom = !this.refs.checked
+        self.setState(tempState)
+    }
+
+    ticketTemplate = (event) => {
+        var self = this;
+        var tempState = self.state;
+        
+        event.preventDefault();
+        console.log("ticket template changed");
+        if((this.state.title !== this.refs.eventName.value) && (this.refs.eventName.value != "")){
+          app.database().ref("events").child("0").child("event").child("name").set(this.refs.eventName.value);
+          tempState.title = this.refs.eventName.value
+          this.refs.eventName.value = ""
+        }
+        if((this.state.time !== this.refs.eventTime.value) && (this.refs.eventTime.value != "")){
+          app.database().ref("events").child("0").child("event").child("time").set(this.refs.eventTime.value);
+          tempState.time = this.refs.eventTime.value
+          this.refs.eventTime.value = ""
+        }
+        if((this.state.date !== this.refs.eventDate.value) && (this.refs.eventDate.value != "")){
+          app.database().ref("events").child("0").child("event").child("date").set(this.refs.eventDate.value);
+          tempState.date = this.refs.eventDate.value
+          this.refs.eventDate = ""
+        }
+        if(this.state.custom !== this.refs.customTicket.checked){
+          app.database().ref("events").child("0").child("event").child("custom").set(this.refs.customTicket.checked);
+          tempState.custom = this.refs.customTicket.checked
+        }
+
+        self.setState(tempState)
+        }
     
 }
 
