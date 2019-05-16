@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import app from '../base'
 import BootstrapTable from 'react-bootstrap-table-next';
+import TicketPopup from './TicketPopup'
 
 
 
@@ -16,6 +17,9 @@ const columns = [{
   }, {
       dataField: 'seller',
       text: 'Seller'
+  },{
+      dataField: 'options',
+      text: 'Options'
   }];
 
 class TicketsList extends Component {
@@ -43,7 +47,15 @@ class TicketsList extends Component {
         tempDataset.push({'id': snapshot2.child(x).val().id,
          'name': snapshot2.child(x).val().name,
           'hash': snapshot2.child(x).val().hash,
-          'seller': snapshot2.child(x).val().seller});
+          'seller': snapshot2.child(x).val().seller,
+         'options': <TicketPopup 
+                id = {x}
+                name={snapshot2.child(x).val().name}
+                hash = {snapshot2.child(x).val().hash}
+                seller={snapshot2.child(x).val().seller}
+                phone={snapshot2.child(x).val().phone}
+                email={snapshot2.child(x).val().email}
+                />});
         }// ...
 
         self.setState({

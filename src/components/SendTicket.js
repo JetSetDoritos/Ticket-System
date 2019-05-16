@@ -34,8 +34,7 @@ class SendTicket extends Component {
         var newname = this.refs.name.value;
         var newphone = this.refs.phone.value;
         var newemail = this.refs.email.value;
-        var seller = app.auth().currentUser.email;
-        console.log(seller)
+        var newseller = app.auth().currentUser.email;
     
         app.database().ref("events").child("0").child("total/").once("value")
         .then(function(snapshot) {
@@ -45,7 +44,7 @@ class SendTicket extends Component {
           name: newname,
           phone: newphone,
           email: newemail,
-
+          seller: newseller,
           id: snapshot.val()+1,
           processed: "false"
         });

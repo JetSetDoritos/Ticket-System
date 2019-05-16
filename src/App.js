@@ -8,11 +8,15 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import Login from './components/Login';
 import {BrowserRouter,Route} from 'react-router-dom';
+import ReactDom from 'react-dom';
 import app from './base'
 import EventSettings from './components/EventSettings'
 import TicketsList from './components/TicketsList';
 import SendTicket from './components/SendTicket'
+import Popup from 'reactjs-popup'
 require('firebase/auth');
+
+
 
 
 
@@ -46,6 +50,7 @@ app.database().ref("events").child("0").child("users").child("admins").once("val
 });
 
 
+
 class App extends Component {
   
   constructor() {
@@ -54,6 +59,10 @@ class App extends Component {
       authenticated: false
     };
   }
+
+
+
+  
 
   componentWillMount() {
     this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
@@ -77,14 +86,17 @@ class App extends Component {
 
 
   render() {
+    
+    
     return (
       <BrowserRouter>
-      <div className="App">
+        <div className="App">
         <Route exact path="/login" component={Login} />
         {this.state.authenticated
         ? null
         : <Link className="linker" to="/login">Login</Link>
         }
+        
         <Tabs>
         <div label="Tickets">
           <center>
@@ -105,14 +117,13 @@ class App extends Component {
           <EventSettings/>
         </div>)
         :  (<div label="User"></div>)}
-      </Tabs>
-      
+      </Tabs>      
       </div>
       </BrowserRouter>
     );
   }
 
-
+  
 
 
   
