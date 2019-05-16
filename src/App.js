@@ -9,6 +9,7 @@ import {Link} from 'react-router-dom';
 import Login from './components/Login';
 import {BrowserRouter,Route} from 'react-router-dom';
 import app from './base'
+import EventSettings from './components/EventSettings'
 require('firebase/auth');
 
 
@@ -56,11 +57,23 @@ app.database().ref("events").child("0").child("event").once("value").then(functi
   eventDate = snapshot.val().date;
   eventTime = snapshot.val().time;
   customTicket = snapshot.val().custom;
-  console.log(snapshot);
+  console.log("eventDetails" + eventName);
   });
 
+const titleGet = getEventTitle()
 
-console.log("Eventname " + eventName);
+function getEventTitle() {
+  app.database().ref("events").child("0").child("event").once("value").then(function(snapshot){
+    eventName = snapshot.val().name;
+    eventDate = snapshot.val().date;
+    eventTime = snapshot.val().time;
+    customTicket = snapshot.val().custom;
+    console.log("eventDetails" + eventName);
+    });
+
+    return(eventName);
+}
+
 
 
 console.log(dataset);
@@ -152,29 +165,7 @@ class App extends Component {
         {isAdmin
         ? (
         <div label="Admin">
-        <form onSubmit={this.ticketTemplate}>
-            <label>
-              Event Name:
-            <input type="text" name="event name" ref="eventName" />
-            </label>
-            <br></br>
-            <label>
-              Event Time:
-            <input type="text" name="event time" ref="eventTime" />
-            </label>
-            <br></br>
-            <label>
-              Event Date:
-            <input type="text" name="name date" ref="eventDate" />
-            </label>
-            <br></br>
-            <label>
-              Custom Ticket:
-              <input type="checkbox" name="custom ticket" ref="customTicket"/>
-            </label>
-            <br></br>
-            <input type="submit" value="Submit" />
-          </form>
+          <EventSettings title="aaaa"/>
         </div>)
         :  (<div label="User"></div>)}
       </Tabs>
