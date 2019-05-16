@@ -14,6 +14,7 @@ import EventSettings from './components/EventSettings'
 import TicketsList from './components/TicketsList';
 import SendTicket from './components/SendTicket'
 import Popup from 'reactjs-popup'
+import ScanCode from './components/ScanCode'
 require('firebase/auth');
 
 
@@ -117,6 +118,10 @@ class App extends Component {
           <EventSettings/>
         </div>)
         :  (<div label="User"></div>)}
+        <div label="Scan">
+        Scan
+        <ScanCode/>
+        </div>
       </Tabs>      
       </div>
       </BrowserRouter>
