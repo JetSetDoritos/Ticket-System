@@ -131,11 +131,13 @@ class App extends Component {
         }
         <Tabs>
         <div label="Tickets">
+          <center>
           List of tickets
           {this.state.authenticated
           ? <BootstrapTable keyField='id' data={ dataset } columns={ columns }  />
           : null
           }
+          </center>
         </div>
         <div label="Send">
           Send Tickets
