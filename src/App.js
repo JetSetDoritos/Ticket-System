@@ -36,22 +36,22 @@ var eventDate = "";
 var eventTime = "";
 var customTicket = false;
 
-var isAdmin = false;
+var isAdmin = true;
 
 
-app.database().ref("total/").once("value")
+app.database().ref("events").child("0").child("total/").once("value")
     .then(function(snapshot) {
   
 
       for(var x = 1; x < snapshot.val()+1; x++){
-        app.database().ref("tickets").child(x).once('value').then(function(snapshot2) {
+        app.database().ref("events").child("0").child("tickets").child(x).once('value').then(function(snapshot2) {
           dataset.push({'id': snapshot2.val().id, 'name': snapshot2.val().name, 'hash': snapshot2.val().hash});
           // ...
         });
       }
     });
 
-app.database().ref("event").once("value").then(function(snapshot){
+app.database().ref("events").child("0").child("event").once("value").then(function(snapshot){
   eventName = snapshot.val().name;
   eventDate = snapshot.val().date;
   eventTime = snapshot.val().time;
@@ -65,7 +65,7 @@ console.log("Eventname " + eventName);
 
 console.log(dataset);
 
-app.database().ref("users").child("admins").once("value").then(function(snapshot){
+app.database().ref("events").child("0").child("users").child("admins").once("value").then(function(snapshot){
   if(app.auth().currentUser)  
     if(snapshot.val().a1 == app.auth().currentUser.uid)
         isAdmin = true;
