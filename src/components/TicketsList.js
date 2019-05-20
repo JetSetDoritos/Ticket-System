@@ -55,6 +55,7 @@ class TicketsList extends Component {
                 seller={snapshot2.child(x).val().seller}
                 phone={snapshot2.child(x).val().phone}
                 email={snapshot2.child(x).val().email}
+                redeemed={snapshot2.child(x).val().redeemed}
                 />});
         }// ...
 

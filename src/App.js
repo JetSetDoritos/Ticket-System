@@ -23,32 +23,6 @@ require('firebase/auth');
 
 var data = require('./data/database.json');
 
-  // Initialize Firebase
-
- 
-
-  /*
-  // Get a reference to the database service
-  var database = firebase.database();
-
-   return firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
-    var username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
-    // ...
-  });*/
-
-console.log(data);
-
-var isAdmin = true;
-
-
-app.database().ref("events").child("0").child("users").child("admins").once("value").then(function(snapshot){
-  if(app.auth().currentUser)  
-    if(snapshot.val().a1 == app.auth().currentUser.uid)
-        isAdmin = true;
-
-      console.log("is admin:");
-      console.log(isAdmin);
-});
 
 
 
@@ -57,7 +31,8 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      authenticated: false
+      authenticated: false,
+      isAdmin: false
     };
   }
 
@@ -66,6 +41,7 @@ class App extends Component {
   
 
   componentWillMount() {
+    var self = this
     this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
       if (user) {
         this.setState({
@@ -78,7 +54,16 @@ class App extends Component {
           //loading: false
         })
       }
+
 })
+app.database().ref("events").child("0").child("users").child("admins").once("value").then(function(snapshot){
+  console.log(snapshot.val().a1)
+  console.log(app.auth().currentUser.uid)
+  if(app.auth().currentUser)  
+    if(snapshot.val().a1 == app.auth().currentUser.uid)
+      self.setState({ isAdmin: true})
+      
+});
   }
 
   componentWillUnmount() {
@@ -112,7 +97,7 @@ class App extends Component {
           Send Tickets
           <SendTicket/>
         </div>
-        {isAdmin
+        {this.state.isAdmin
         ? (
         <div label="Admin">
           <EventSettings/>

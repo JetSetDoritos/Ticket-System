@@ -12,7 +12,8 @@ class TicketPopup extends Component {
             seller: props.seller,
             email: props.email,
             phone: props.phone,
-            id: props.id
+            id: props.id,
+            redeemed: "true"
         };
     }
     
@@ -38,6 +39,11 @@ class TicketPopup extends Component {
               <br />
               <b>Seller: </b> {this.props.seller}
               <br />
+              <b>Redeemed: </b> {this.props.redeemed
+              ? "Ticket has been redeemed."
+              : "Ticket has not been redeemed."
+              }
+              <br/>
             </div>
             <div className="actions">
               <button
