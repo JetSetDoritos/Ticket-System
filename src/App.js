@@ -4,68 +4,119 @@ import './App.css';
 import BootstrapTable from 'react-bootstrap-table-next';
 import Tabs from './Tabs';
 import PropTypes from 'prop-types';
+//import * as firebase from 'firebase';
+import {Link} from 'react-router-dom';
+import Login from './components/Login';
+import {BrowserRouter,Route} from 'react-router-dom';
+import ReactDom from 'react-dom';
+import app from './base'
+import EventSettings from './components/EventSettings'
+import TicketsList from './components/TicketsList';
+import SendTicket from './components/SendTicket'
+import Popup from 'reactjs-popup'
+import ScanCode from './components/ScanCode'
+require('firebase/auth');
+
+
+
 
 
 var data = require('./data/database.json');
 
-console.log(data);
-
-var dataset = [];
-var datasize = 0;
-var dummy;
-for(dummy in data){
-  datasize++;
-}
-for (var x = 1; x < datasize+1; x++){
-  console.log(x)
-  dataset.push({'id': data[x.toString()].id, 'name': data[x.toString()].name, 'hash': data[x.toString()].hash});
-}
-
-console.log(dataset);
 
 
-
-const columns = [{
-  dataField: 'id',
-  text: 'ID'
-}, {
-  dataField: 'name',
-  text: 'Name'
-}, {
-  dataField: 'hash',
-  text: 'Hash'
-}];
-
-
-const products = [{'id': '1', 'name': '2', 'price': '3'}]
-console.log(products);
 
 class App extends Component {
   
+  constructor() {
+    super();
+    this.state = {
+      authenticated: false,
+      isAdmin: false
+    };
+  }
+
+
+
+  
+
+  componentWillMount() {
+    var self = this
+    this.removeAuthListener = app.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({
+          authenticated: true,
+          //loading: false
+        })
+      } else {
+        this.setState({
+          authenticated: false,
+          //loading: false
+        })
+      }
+
+})
+app.database().ref("events").child("0").child("users").child("admins").once("value").then(function(snapshot){
+  console.log(snapshot.val().a1)
+  console.log(app.auth().currentUser.uid)
+  if(app.auth().currentUser)  
+    if(snapshot.val().a1 == app.auth().currentUser.uid)
+      self.setState({ isAdmin: true})
+      
+});
+  }
+
+  componentWillUnmount() {
+    this.removeAuthListener();
+  }
+
+
   render() {
+    
+    
     return (
-      <div className="App">
+      <BrowserRouter>
+        <div className="App">
+        <Route exact path="/login" component={Login} />
+        {this.state.authenticated
+        ? null
+        : <Link className="linker" to="/login">Login</Link>
+        }
         
         <Tabs>
-        <div label="Gator">
-          See ya later, <em>Alligator</em>!
+        <div label="Tickets">
+          <center>
+          List of tickets
+          {this.state.authenticated
+          ? <TicketsList/>
+          : null
+          }
+          </center>
         </div>
-        <div label="Croc">
-          After &apos;while, <em>Crocodile</em>!
-          <BootstrapTable keyField='id' data={ dataset } columns={ columns }  />
+        <div label="Send">
+          Send Tickets
+          <SendTicket/>
         </div>
-        <div label="Sarcosuchus">
-          Nothing to see here, this tab is <em>extinct</em>!
+        {this.state.isAdmin
+        ? (
+        <div label="Admin">
+          <EventSettings/>
+        </div>)
+        :  (<div label="User"></div>)}
+        <div label="Scan">
+        Scan
+        <ScanCode/>
         </div>
-      </Tabs>
-
-
-
-
-
+      </Tabs>      
       </div>
+      </BrowserRouter>
     );
   }
+
+  
+
+
+  
 }
 
 export default App;
