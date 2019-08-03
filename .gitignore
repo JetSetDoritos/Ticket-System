@@ -107,5 +107,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 .firebase/hosting.YnVpbGQ.cache
+node_modules
+.firebase
 
 
