@@ -9,7 +9,7 @@ This project is under passive development, many features still require being imp
 
 Example of tickets
 
-<img src="../readme-hosting/images/example-custom.png?raw=true" width="200"><img src="../readme-hosting/images/example-standard.png?raw=true" width="200">
+<img src="../readme-hosting/images/example-custom.png?raw=true" width="200"> ||||| <img src="../readme-hosting/images/example-standard.png?raw=true" width="200">
 
 Ticket List
 
